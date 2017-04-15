@@ -219,8 +219,9 @@ public class Camera2VideoFragment extends Fragment
     private String mNextVideoAbsolutePath;
     private CaptureRequest.Builder mPreviewBuilder;
     private Surface mRecorderSurface;
+	private boolean mMirrorPreview = true;
 
-    public static Camera2VideoFragment newInstance() {
+	public static Camera2VideoFragment newInstance() {
         return new Camera2VideoFragment();
     }
 
@@ -428,7 +429,7 @@ public class Camera2VideoFragment extends Fragment
             if (!mCameraOpenCloseLock.tryAcquire(2500, TimeUnit.MILLISECONDS)) {
                 throw new RuntimeException("Time out waiting to lock camera opening.");
             }
-            String cameraId = manager.getCameraIdList()[0];
+            String cameraId = manager.getCameraIdList()[1];
 
             // Choose the sizes for camera preview and video recording
             CameraCharacteristics characteristics = manager.getCameraCharacteristics(cameraId);
@@ -567,6 +568,9 @@ public class Camera2VideoFragment extends Fragment
             matrix.postScale(scale, scale, centerX, centerY);
             matrix.postRotate(90 * (rotation - 2), centerX, centerY);
         }
+	    if (mMirrorPreview) {
+		    matrix.postScale(-1, 1, centerX, centerY);
+	    }
         mTextureView.setTransform(matrix);
     }
 
